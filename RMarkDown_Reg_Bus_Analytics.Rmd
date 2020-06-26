@@ -1,0 +1,312 @@
+---
+title: "Regression in Business Analytics"
+author: "Ahmed Yahya Khaled"
+date: "6/27/2020"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Loading Libraries
+
+```{r libraries, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(tidyverse)
+library(plot3D)
+```
+
+## Problem 1
+
+The Dow Jones Industrial Average (DJIA) and the Standard & Poor’s 500 (S&P 500) indexes are used as measures of overall movement in the stock market. The DJIA is based on the price movements of 30 large companies; the S&P 500 is an index composed of 500 stocks. Some say the S&P 500 is a better measure of stock market performance because it is broader based. The closing price for the DJIA and the S&P 500 for 15 weeks, beginning with January 6, 2012, follow (Barron’s Web site, April 17, 2012).
+
+#### data : data1.csv
+
+#### Import Data
+```{r Import}
+# set working directory
+d1 <- read.csv("data1.csv", header = T)
+#View(d1)
+head(d1)
+glimpse(d1)
+```
+
+
+#### EDA
+```{r EDA}
+ggplot(d1)+
+  geom_point(aes(x = DJIA, y = S_and_P), stroke = 3, color = 'blue')+
+  ggtitle("DJIA vs. S&P 500")+
+  theme_classic()
+```
+
+
+### 1.a)
+Develop an estimated regression equation showing how S&P 500 is related to DJIA. What is the estimated regression model?
+
+```{r LM1}
+linReg1 <- lm(S_and_P ~  DJIA , d1)
+linReg1$coefficients
+```
+
+#### Estimated Regression equation
+##### **S_and_P.hat = (-666.5546463) + 0.1570681(DJIA)**
+
+
+#### Estimated regression model
+```{r LM1.sum}
+summary(linReg1)
+```
+
+```{r EDA_after_LM}
+ggplot(d1)+
+  geom_point(aes(x = DJIA, y = S_and_P), stroke = 3, color = 'blue')+
+  # geom_abline(intercept = linReg1$coefficients[1], slope =   linReg1$coefficients[2],lwd = 1.5,color = 'red')+
+  geom_smooth(aes(x = DJIA, y = S_and_P), method = 'lm', lwd = 1.5, color = 'red')+ 
+  ggtitle("The Regression line with confidence interval")+
+  theme_classic()
+```
+
+### 1.b)
+What is the 95 percent confidence interval for the regression parameter b1? Based on this interval, what conclusion can you make about the hypotheses that the regression parameter b1 is equal to zero? 
+
+```{r LM1.confint}
+confint(linReg1, level = 0.95)
+```
+
+#### The 95 percent confidence interval for the regression parameter b1
+##### **[0.135  ,  0.179]**
+
+#### When the regression parameter b1(slope) is equal to zero, we fail to reject the **Null Hypothesis** that there is no linear relationship between S_and_P and DJIA.
+
+
+### 1.c)
+What is the 95 percent confidence interval for the regression parameter b0? Based on this interval, what conclusion can you make about the hypotheses that the regression parameter b0 is equal to zero?
+
+```{r LM1.confint2}
+confint(linReg1, level = 0.95)
+```
+
+#### The 95 percent confidence interval for the regression parameter b0
+##### **[-949.567  ,  -383.542]**
+
+#### When the regression parameter b0(intercept) is equal to zero, we can conclude that S_and_P and DJIA are same in terms of the measure for stock market performance
+
+### 1.d)
+Suppose that the closing price for the DJIA is 13,500. Estimate the closing price for the S&P 500. 
+
+```{r ypred}
+S_and_P.pred <- predict(linReg1, newdata = data.frame(DJIA = 13500))
+S_and_P.pred
+```
+#### The estimated closing price of S&P 500 is **1453.865**
+
+### 1.e)
+Should we be concerned that the DJIA value of 13,500 used to predict the S&P 500 value we have just calculated is beyond the range of the DJIA used to develop the estimated regression equation? 
+
+#### It is one of the benefits of the regression analysis to be able to predict the dependent variable for a independent variable value which is beyond the range of the value with which the model was trained. 
+
+
+
+## Problem 2
+
+Dixie Showtime Movie Theaters, Inc., owns and operates a chain of cinemas in several markets in the southern United States. The owners would like to estimate weekly gross revenue as a function of advertising expenditures. Data for a sample of eight markets for a recent week follow.
+
+#### data : data2.csv
+
+##### set working directory
+
+#### Import Data
+```{r Import_2}
+d2 <- read.csv("data2.csv", header = T)
+#View(d2)
+head(d2)
+glimpse(d2)
+```
+
+#### EDA
+```{r EDA_2}
+ggplot(d2)+
+  geom_point(aes(x = Television_Adertising,
+                 y = Weekly_Gross_Revenue), 
+             stroke = 3, color = 'blue')+
+  ggtitle("Television Advertising vs. Weekly Gross Revenue") +
+  theme_classic()
+```
+
+```{r EDA_2.2}
+ggplot(d2)+
+  geom_point(aes(x = Newspaper_Advertising,
+                 y = Weekly_Gross_Revenue), 
+             stroke = 3, color = 'darkgreen')+
+  ggtitle("Newspaper Advertising vs. Weekly Gross Revenue") +
+  theme_classic()
+```
+
+
+### 2.a)
+Develop an estimated regression equation with the amount of television advertising as the independent variable. Test for a significant relationship between television advertising and weekly gross revenue at the 0.05 level of significance. What is the interpretation of this relationship?
+
+
+```{r LM2}
+linReg2 <- lm(Weekly_Gross_Revenue ~  Television_Adertising , d2)
+linReg2$coefficients
+```
+
+#### Estimated Regression equation
+##### **Weekly_Gross_Revenue.hat = (-45.43235) + 40.06399(Television_Adertising)**
+
+```{r EDA_after_LM_2}
+ggplot(d2)+
+  geom_point(aes(x = Television_Adertising, y = Weekly_Gross_Revenue), 
+             stroke = 3, color = 'blue')+
+  geom_smooth(aes(x = Television_Adertising, y = Weekly_Gross_Revenue), 
+              method = 'lm', lwd = 1.5, color = 'red')+ 
+  ggtitle("The Regression line of Weekly_Gross_Revenue ~ Television_Adertising with confidence interval")+
+  theme_classic()
+```
+
+```{r LM2.sum}
+summary(linReg2)
+```
+
+Here, p-value = 0.03389 \
+alpha = 0.05 \
+
+Ho = p-value > alpha \
+Ha = p-value <= alpha \
+
+as 0.03389 < 0.05 , we can reject the null hypothesis and conlcude that **there is a significant relationship between television advertising and weekly gross revenue.**
+
+### 2.b)
+How much of the variation in the sample values of weekly gross revenue does the model in part a explain?
+
+#### R-Squared = 0.5552, so *55.52%* of the variation in the sample values of weekly gross revenue does the model in part a explain.
+
+```{r ypredtv}
+d2$ypredtv <- predict(linReg2, newdata = d2)
+ggplot(d2)+
+  geom_point(aes(x = Television_Adertising, y = Weekly_Gross_Revenue),
+             stroke = 2.5, color = 'blue') +
+  geom_point(aes(x = Television_Adertising, y = ypredtv),
+             stroke = 3, color = 'red')+
+  ggtitle('Weekly_Gross_Revenue - actual and model predicted')+
+  theme_classic()
+
+d2 <- d2[, 1:4]
+             
+```
+
+
+
+
+### 2.c)
+Develop an estimated regression equation with both television advertising and newspaper advertising as the independent variables. Is the overall regression statistically significant at the 0.05 level of significance? What is the interpretation of this relationship?
+
+```{r LM2_22}
+linReg3 <- lm(Weekly_Gross_Revenue ~  Television_Adertising +
+                Newspaper_Advertising , d2)
+linReg3$coefficients
+```
+
+#### Estimated Regression equation
+##### **Weekly_Gross_Revenue.hat = (-42.56959) + 22.40224(Television_Adertising) + 19.49863(Newspaper_Advertising)**
+
+```{r ypred3}
+d2$ypred_tv_np <- predict(linReg3, newdata = d2)
+x <- d2$Television_Adertising
+y <- d2$Newspaper_Advertising
+za <- d2$Weekly_Gross_Revenue
+zb <- d2$ypred_tv_np
+
+par(mfrow = c(1, 2))
+scatter3D(x, y, za, colvar = NULL, bty = "g",
+          col = "blue", pch = 16, cex = 2,
+          phi = 10,
+          xlab = 'TV Adv',
+          ylab = 'Newspaper Adv',
+          zlab = 'Weekly_Gross_Revenue',
+          main = '*Actual* ~Weekly_Gross_Revenue')
+
+
+scatter3D(x, y, zb, colvar = NULL, bty = "g",
+          col = "red", pch = 16, cex = 2,
+          phi = 10,
+          xlab = 'TV Adv',
+          ylab = 'Newspaper Adv',
+          zlab = 'Weekly_Gross_Revenue',
+          main = '*Predicted* ~Weekly_Gross_Revenue')
+
+```
+
+
+```{r lm3_3_viz}
+scatter3D(x, y, zb, colvar = NULL, bty = "g", type = "l",
+          col = "red", lwd = 3.5,
+          phi = 10,
+          xlab = 'TV Adv',
+          ylab = 'Newspaper Adv',
+          zlab = 'Weekly_Gross_Revenue',
+          main = 'The Regression Line')
+d2 <- d2[, 1:4]
+```
+
+```{r LM3.sum}
+summary(linReg3)
+```
+
+Here, p-value = 0.001196 \
+alpha = 0.05 \
+
+Ho = p-value > alpha \
+Ha = p-value <= alpha \
+
+as 0.001196 < 0.05 , we can reject the null hypothesis and conlcude that **there is a significant relationship between television advertising and weekly gross revenue.** \
+and if we compare the p-value, adding the second independent variable results in lower p-value thus generated a better regression model.
+
+### 2.d)
+How much of the variation in the sample values of weekly gross revenue does the model in part c explain?
+
+#### R-Squared = 0.9322, so *93.22%* of the variation in the sample values of weekly gross revenue does the model in part c explain.
+
+
+### 2.e)
+Given the results in parts a and c, what should your next step be? Explain. 
+
+The next step can be to check the relation of weekly gross revenue with the newspaper advertising only
+
+
+
+```{r LM4}
+linReg4 <- lm(Weekly_Gross_Revenue ~  Newspaper_Advertising , d2)
+summary(linReg4)
+```
+
+R-squared = 0.7973 ; p-value = 0.00283
+
+```{r EDA_after_LM_4}
+ggplot(d2)+
+  geom_point(aes(x = Newspaper_Advertising, y = Weekly_Gross_Revenue), 
+             stroke = 3, color = 'darkgreen')+
+  geom_smooth(aes(x = Newspaper_Advertising, y = Weekly_Gross_Revenue), 
+              method = 'lm', lwd = 1.5, color = 'red')+ 
+  ggtitle("The Regression line of Weekly_Gross_Revenue ~ Newspaper_Advertising with confidence interval")+
+  theme_classic()
+```
+
+### 2.f)
+What are the managerial implications of these results? \
+
+- *Newspaper Advertising has more impact over Weekly Gross Revenue*
+- *Television and Newspaper Advertising combinely has very good impact over Revenue*
+- *Weekly Gross Revenue can be predicted with any combination of advertising expense category*
+- *In case of stringent advertising budget more portion can be allocated to Newspaper advertising than Television advertising*
+
+
+
+
+
+
+
